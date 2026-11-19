@@ -26,7 +26,8 @@ export function Navbar() {
 
   async function handleLogout() {
     await supabase.auth.signOut();
-    router.replace("/login");
+    router.replace("/");
+    router.refresh();
   }
 
   return (
@@ -39,7 +40,7 @@ export function Navbar() {
           StudySync
         </Link>
 
-        {userEmail && pathname !== "/login" && (
+        {userEmail ? (
           <div className="flex flex-wrap items-center gap-4 text-sm font-medium text-slate-700 sm:gap-6">
             <Link href="/" className="transition hover:text-blue-600">
               Dashboard
@@ -65,6 +66,17 @@ export function Navbar() {
               </button>
             </div>
           </div>
+        ) : (
+          pathname !== "/login" && (
+            <div className="flex items-center gap-3">
+              <Link
+                href="/login"
+                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
+              >
+                Masuk / Daftar
+              </Link>
+            </div>
+          )
         )}
       </nav>
     </header>

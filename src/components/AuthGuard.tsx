@@ -4,6 +4,8 @@ import { useEffect, useState, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { supabase } from "@/src/lib/supabase";
 
+const PUBLIC_PATHS = ["/", "/login"];
+
 export function AuthGuard({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -19,7 +21,7 @@ export function AuthGuard({ children }: { children: ReactNode }) {
 
       if (!isMounted) return;
 
-      if (!session && pathname !== "/login") {
+      if (!session && !PUBLIC_PATHS.includes(pathname)) {
         router.replace("/login");
       } else if (session && pathname === "/login") {
         router.replace("/");
@@ -33,7 +35,7 @@ export function AuthGuard({ children }: { children: ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!session && pathname !== "/login") {
+      if (!session && !PUBLIC_PATHS.includes(pathname)) {
         router.replace("/login");
       } else if (session && pathname === "/login") {
         router.replace("/");

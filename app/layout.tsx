@@ -18,7 +18,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <AuthGuard>{children}</AuthGuard>
         </main>
         <footer className="border-t border-slate-200 bg-white py-6 text-center text-sm text-slate-500">
-          StudySync &copy; 2026 &mdash; Final Project Web Development I
+          StudySync &copy; 2026 &mdash; Final Project Web Development I &bull; aeiaden
         </footer>
       </body>
     </html>

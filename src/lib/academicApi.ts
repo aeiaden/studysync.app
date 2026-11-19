@@ -1,7 +1,6 @@
 import { supabase } from "./supabase";
 import type { TaskStatus } from "@/src/types/academic";
 
-// --- COURSES ---
 export async function getCourses() {
   const { data, error } = await supabase.from("courses").select("*").order("code");
   if (error) throw new Error("Gagal memuat daftar mata kuliah.");
