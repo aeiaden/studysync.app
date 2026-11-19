@@ -10,15 +10,15 @@
 
 | Halaman Intro (Landing Page) | Halaman Login & Register |
 | :---: | :---: |
-| ![Landing Page](./public/Screenshot (385).png) | ![Login Page](./public/Screenshot (386).png) |
+| ![Landing Page](./public/ss-1.png) | ![Login Page](./public/ss-2.png) |
 
 | Dashboard Utama | Task Manager & Deadline |
 | :---: | :---: |
-| ![Dashboard](./public/Screenshot (387).png) | ![Task Manager](./public/Screenshot (388).png) |
+| ![Dashboard](./public/ss-3.png) | ![Task Manager](./public/ss-4.png) |
 
 | Schedule & Mata Kuliah | Personal Notes |
 | :---: | :---: |
-| ![Schedule](./public/Screenshot (389).png) | ![Notes](./public/Screenshot (394).png) |
+| ![Schedule](./public/ss-5.png) | ![Notes](./public/ss-6.png) |
 
 ---
 
