@@ -12,7 +12,7 @@ export async function createCourse(payload: { code: string; name: string; lectur
   const { error } = await supabase.from("courses").insert(payload);
   if (error) {
     if (error.code === "23505") throw new Error("Kode mata kuliah sudah terdaftar.");
-    throw new Error("Gagal menambahkan mata kuliah.");
+    throw new Error(`Gagal menambahkan mata kuliah: ${error.message}`);
   }
 }
 
