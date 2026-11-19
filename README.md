@@ -17,5 +17,5 @@ Aplikasi web manajemen akademik mahasiswa untuk mencatat tugas beserta *deadline
 ## Cara Menjalankan di Lokal (Setup)
 1. Clone repository ini:
    ```bash
-   git clone [https://github.com/aeiaden/studysync.app.git](https://github.com/aeiaden/studysync.app.git)
-   cd studysync-app
+   git clone https://github.com/aeiaden/studysync.app.git
+cd studysync.app
