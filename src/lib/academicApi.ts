@@ -16,6 +16,17 @@ export async function createCourse(payload: { code: string; name: string; lectur
   }
 }
 
+export async function updateCourse(
+  id: string,
+  payload: { code: string; name: string; lecturer?: string | null }
+) {
+  const { error } = await supabase.from("courses").update(payload).eq("id", id);
+  if (error) {
+    if (error.code === "23505") throw new Error("Kode mata kuliah sudah terdaftar.");
+    throw new Error(`Gagal memperbarui mata kuliah: ${error.message}`);
+  }
+}
+
 export async function deleteCourse(id: string) {
   const { error } = await supabase.from("courses").delete().eq("id", id);
   if (error) throw new Error("Gagal menghapus mata kuliah.");

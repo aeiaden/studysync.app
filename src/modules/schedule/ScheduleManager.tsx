@@ -5,6 +5,7 @@ import { supabase } from "@/src/lib/supabase";
 import {
   getCourses,
   createCourse,
+  updateCourse,
   deleteCourse,
   getSchedules,
   createSchedule,
@@ -20,7 +21,8 @@ export function ScheduleManager() {
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
 
-  // State Form Mata Kuliah
+  // State Form Mata Kuliah (Tambah & Edit)
+  const [editingCourseId, setEditingCourseId] = useState<string | null>(null);
   const [courseCode, setCourseCode] = useState("");
   const [courseName, setCourseName] = useState("");
   const [courseLecturer, setCourseLecturer] = useState("");
@@ -57,7 +59,23 @@ export function ScheduleManager() {
   }, []);
 
   // --- HANDLER MATA KULIAH ---
-  async function handleAddCourse(e: FormEvent<HTMLFormElement>) {
+  function resetCourseForm() {
+    setEditingCourseId(null);
+    setCourseCode("");
+    setCourseName("");
+    setCourseLecturer("");
+  }
+
+  function handleEditCourseClick(course: Course) {
+    setEditingCourseId(course.id);
+    setCourseCode(course.code);
+    setCourseName(course.name);
+    setCourseLecturer(course.lecturer ?? "");
+    setCourseMsg("");
+    setCourseErr("");
+  }
+
+  async function handleSaveCourse(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setCourseMsg("");
     setCourseErr("");
@@ -68,18 +86,28 @@ export function ScheduleManager() {
     }
 
     try {
-      await createCourse({
+      const payload = {
         code: courseCode.trim().toUpperCase(),
         name: courseName.trim(),
-        lecturer: courseLecturer.trim() || undefined,
-      });
-      setCourseCode("");
-      setCourseName("");
-      setCourseLecturer("");
-      setCourseMsg("Mata kuliah berhasil ditambahkan!");
+        lecturer: courseLecturer.trim() || null,
+      };
+
+      if (editingCourseId) {
+        await updateCourse(editingCourseId, payload);
+        setCourseMsg("Mata kuliah berhasil diperbarui!");
+      } else {
+        await createCourse({
+          code: payload.code,
+          name: payload.name,
+          lecturer: payload.lecturer ?? undefined,
+        });
+        setCourseMsg("Mata kuliah berhasil ditambahkan!");
+      }
+
+      resetCourseForm();
       await fetchData();
     } catch (err) {
-      setCourseErr(err instanceof Error ? err.message : "Gagal menambah mata kuliah.");
+      setCourseErr(err instanceof Error ? err.message : "Gagal menyimpan mata kuliah.");
     }
   }
 
@@ -87,6 +115,7 @@ export function ScheduleManager() {
     if (!confirm("Hapus mata kuliah ini? Tugas dan catatan terkait juga akan terhapus.")) return;
     try {
       await deleteCourse(id);
+      if (editingCourseId === id) resetCourseForm();
       await fetchData();
     } catch {
       alert("Gagal menghapus mata kuliah.");
@@ -175,8 +204,10 @@ export function ScheduleManager() {
 
       {/* BAGIAN 1: KELOLA MATA KULIAH */}
       <div className="space-y-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-slate-900">Daftar Mata Kuliah</h2>
-        <form onSubmit={handleAddCourse} noValidate className="grid grid-cols-1 gap-4 sm:grid-cols-4">
+        <h2 className="text-lg font-semibold text-slate-900">
+          {editingCourseId ? "Edit Mata Kuliah" : "Daftar Mata Kuliah"}
+        </h2>
+        <form onSubmit={handleSaveCourse} noValidate className="grid grid-cols-1 gap-4 sm:grid-cols-4">
           <div>
             <label htmlFor="course-code" className="block text-xs font-medium text-slate-700">
               Kode Matkul
@@ -216,32 +247,51 @@ export function ScheduleManager() {
               className="mt-1 w-full rounded-lg border border-slate-300 p-2 text-sm"
             />
           </div>
-          <div className="flex items-end">
+          <div className="flex items-end gap-2">
             <button
               type="submit"
               className="w-full rounded-lg bg-slate-800 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-900"
             >
-              + Tambah Matkul
+              {editingCourseId ? "Simpan Perubahan" : "+ Tambah Matkul"}
             </button>
+            {editingCourseId && (
+              <button
+                type="button"
+                onClick={resetCourseForm}
+                className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+              >
+                Batal
+              </button>
+            )}
           </div>
         </form>
 
         {courseErr && <p role="alert" className="text-xs font-medium text-red-600">{courseErr}</p>}
         {courseMsg && <p role="status" className="text-xs font-medium text-green-600">{courseMsg}</p>}
 
-        {/* Chip Daftar Mata Kuliah */}
+        {/* Daftar Kartu/Chip Mata Kuliah */}
         <div className="flex flex-wrap gap-2 pt-2">
           {courses.map((c) => (
             <span
               key={c.id}
-              className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-700"
+              className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-700"
             >
-              <strong>{c.code}</strong> - {c.name}
+              <span>
+                <strong>{c.code}</strong> - {c.name}
+                {c.lecturer ? ` (${c.lecturer})` : ""}
+              </span>
+              <button
+                type="button"
+                onClick={() => handleEditCourseClick(c)}
+                className="ml-1 font-semibold text-blue-600 hover:underline"
+              >
+                Edit
+              </button>
               <button
                 type="button"
                 aria-label={`Hapus mata kuliah ${c.name}`}
                 onClick={() => handleDeleteCourse(c.id)}
-                className="ml-1 text-red-500 hover:text-red-700"
+                className="font-semibold text-red-500 hover:text-red-700"
               >
                 &times;
               </button>
